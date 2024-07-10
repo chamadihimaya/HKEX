@@ -27,3 +27,9 @@ jobs:
     - name: Run script
       run: |
         python webscraping_hkex_3etfs.py
+
+    - name: Upload CSV as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: aum-data
+        path: aum_data.csv
