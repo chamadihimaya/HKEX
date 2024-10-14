@@ -5,13 +5,12 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import pandas as pd
-import datetime
+import os  
 import time
-import os  # To check if the CSV exists
 
 # Set up Selenium options
 chrome_options = Options()
-chrome_options.add_argument("--headless")  # Run in headless mode for automation
+chrome_options.add_argument("--headless")  # Run in headless mode
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
@@ -48,13 +47,17 @@ driver.quit()
 time_9008_date = time_9008.replace('as at ', '').strip()
 current_date = time_9008_date
 
-# Load or create a CSV file to store the AUM data
+# Load the CSV file if it exists and has data, otherwise create a new DataFrame
 csv_file = 'aum_data.csv'
 
-# Check if the CSV file exists
-if os.path.exists(csv_file):
-    df = pd.read_csv(csv_file)
+if os.path.exists(csv_file) and os.path.getsize(csv_file) > 0:
+    try:
+        df = pd.read_csv(csv_file)
+    except pd.errors.EmptyDataError:
+        print("CSV is empty, creating a new DataFrame.")
+        df = pd.DataFrame(columns=['Date', 'AUM_9008', 'AUM_9042', 'AUM_9439'])
 else:
+    print("CSV not found or empty, creating a new DataFrame.")
     df = pd.DataFrame(columns=['Date', 'AUM_9008', 'AUM_9042', 'AUM_9439'])
 
 # Check if the current date is already in the DataFrame
