@@ -2,40 +2,47 @@ name: Python application
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
-  workflow_dispatch:  # Allows manual triggering
+    - cron: '0 0 * * *'  # Runs the script daily at midnight UTC
+  workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Checkout the repository
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Download CSV from previous runs (if available)
+    # Step 2: Download previous CSV if available (reuse data across runs)
+    - name: Restore previous CSV if available
       run: |
         if [ -f "aum_data.csv" ]; then
-          echo "CSV file found."
+          echo "CSV file found, reusing it."
         else
-          touch aum_data.csv  # Create an empty file if not found
-          echo "Creating a new CSV file."
+          echo "No previous CSV found, creating a new one."
+          touch aum_data.csv
         fi
 
+    # Step 3: Set up Python
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
 
+    # Step 4: Install dependencies
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run script
-      run: python webscraping_hkex_3etfs.py
+    # Step 5: Run the web scraping script
+    - name: Run web scraping script
+      run: |
+        python webscraping_hkex_3etfs.py
 
-    - name: Upload updated CSV
+    # Step 6: Upload the CSV as an artifact for future runs
+    - name: Upload CSV as artifact
       uses: actions/upload-artifact@v3
       with:
         name: aum-data
