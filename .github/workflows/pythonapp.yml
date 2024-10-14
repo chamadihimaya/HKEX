@@ -2,17 +2,25 @@ name: Python application
 
 on:
   schedule:
-    - cron: '0 0 * * *' # This runs the script daily at midnight UTC
-  workflow_dispatch: # Allows manual triggering of the workflow
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+    - name: Download CSV from previous runs (if available)
+      run: |
+        if [ -f "aum_data.csv" ]; then
+          echo "CSV file found."
+        else
+          touch aum_data.csv  # Create an empty file if not found
+          echo "Creating a new CSV file."
+        fi
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -25,10 +33,9 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run script
-      run: |
-        python webscraping_hkex_3etfs.py
+      run: python webscraping_hkex_3etfs.py
 
-    - name: Upload CSV as artifact
+    - name: Upload updated CSV
       uses: actions/upload-artifact@v3
       with:
         name: aum-data
