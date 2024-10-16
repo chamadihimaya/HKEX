@@ -41,7 +41,7 @@ driver.quit()
 current_date = time_9008.replace('as at ', '').strip()
 
 # Define the path to the CSV file
-csv_file = 'data/aum_data.csv'  # Use the correct directory
+csv_file = 'aum_data.csv'  # Use the correct directory
 
 # Load or create the DataFrame
 if os.path.exists(csv_file):
